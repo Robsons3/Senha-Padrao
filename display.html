@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Senhas Recebidas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #121212;
+      color: #eee;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    li {
+      background: #222;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: monospace;
+    }
+    .timestamp {
+      font-size: 14px;
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Senhas Recebidas</h1>
+  <ul id="lista-senhas"></ul>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9s6G9lmpTmZEh9jXdKP8-EagsvEHrf0",
+      authDomain: "senhapadrao-e0c64.firebaseapp.com",
+      projectId: "senhapadrao-e0c64",
+      storageBucket: "senhapadrao-e0c64.firebasestorage.app",
+      messagingSenderId: "653510904734",
+      appId: "1:653510904734:web:a900204d66b5396bb3a48f",
+      measurementId: "G-QY23L56RZK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const listaSenhasEl = document.getElementById('lista-senhas');
+    const senhasRef = ref(db, 'senhas');
+
+    onValue(senhasRef, (snapshot) => {
+      listaSenhasEl.innerHTML = '';
+      const data = snapshot.val();
+      if (!data) {
+        listaSenhasEl.innerHTML = '<li>Nenhuma senha recebida ainda.</li>';
+        return;
+      }
+      Object.entries(data).forEach(([key, valor]) => {
+        const li = document.createElement('li');
+        const senhaOculta = '*'.repeat(valor.senha.length);
+        const dataFormatada = valor.timestamp ? new Date(valor.timestamp).toLocaleString() : '...';
+        li.innerHTML = `<span>Senha: ${senhaOculta}</span><span class="timestamp">${dataFormatada}</span>`;
+        listaSenhasEl.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
